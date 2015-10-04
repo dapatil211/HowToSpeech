@@ -52,7 +52,7 @@ public class Utilities {
 		bigMovementTime = Double.parseDouble(myoOutputStrings.get(2));
 
 		ArrayList<Double> graphData = new ArrayList<Double>();
-		for (int i = 3; i < myoOutputStrings.size(); i += 2) {
+		for (int i = 3; i < myoOutputStrings.size(); i++) {
 			double movementType = Double.parseDouble(myoOutputStrings.get(i));
 			int length = Integer.parseInt(myoOutputStrings.get(++i));
 			for (int j = 0; j < length; j++) {
@@ -135,7 +135,7 @@ public class Utilities {
 	{
 		executeMyo();
 		try {
-			Thread.sleep(5000);
+			Thread.sleep(30000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -145,6 +145,30 @@ public class Utilities {
 		System.out.println("Total Time: " + totalTime);
 		System.out.println("Small Movement Time: " + smallMovementTime);
 		System.out.println("Big Movement Time: " + bigMovementTime);
+		
+		double total = 0, small = 0, big = 0;
+		
+		for (int i = 0; i < movementGraph.length; i++)
+		{
+			if (movementGraph[i] == 0)
+			{
+				total++;
+			}
+			
+			else if (movementGraph[i] == 1)
+			{
+				small++;
+			}
+			
+			else if (movementGraph[i] == 2)
+			{
+				big++;
+			}
+		}
+		
+		System.out.println("New No Movement Time: " + (total/10.0));
+		System.out.println("New Small Movement Time: " + (small/10.0));
+		System.out.println("New Big Movement Time: " + (big/10.0));
 	}
 
 }
