@@ -29,7 +29,7 @@ public class RecordServlet extends HttpServlet {
 		}
 		else if("stop".equals(action)){
 			long id = Long.parseLong(req.getParameter("user_id"));
-			threads.get(id).isRunning = false;
+			threads.get(id).finish();
 			Map<String, String> retVal = new HashMap<String, String>();
 
 			// Set appropriately based on Watson and our own processing
