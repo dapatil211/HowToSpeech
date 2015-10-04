@@ -45,9 +45,10 @@ function stopRecord ()
 
 function writeResults (data)
 {
-	$("#speech_txt").val(data["speech"]);
+	$("#speech_txt").text(data["speech"]);
 	$("#movements_img").attr("src", data["movement_graph"]);
 	$("#volume_img").attr("src", data["volume_graph"]);
+	$("#concentration_img").attr("src", data["concentration_graph"]);
 	$("#tone_txt").text(data["tone"]);
 	$("#grade_txt").text("Your Grade: " + data["grade"]);
 	$("#details_txt").text(data["details"]);
