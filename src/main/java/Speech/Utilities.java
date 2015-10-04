@@ -81,6 +81,28 @@ public class Utilities {
 		for (int i = 0; i < movementGraph.length; i++) {
 			movementGraph[i] = graphData.get(i);
 		}
+double total = 0, small = 0, big = 0;
+		
+		for (int i = 0; i < movementGraph.length; i++)
+		{
+			if (movementGraph[i] == 0)
+			{
+				total++;
+			}
+			
+			else if (movementGraph[i] == 1)
+			{
+				small++;
+			}
+			
+			else if (movementGraph[i] == 2)
+			{
+				big++;
+			}
+		}
+		totalTime = (int) (total/10.0);
+		smallMovementTime = small/10.0;
+		bigMovementTime = big/10.0;
 	}
 
 	public static int getTotalTime() {
@@ -220,45 +242,27 @@ public class Utilities {
 		else return "F";
 	}
 
-	public static void main(String[] args)
-	{
-		executeMyo();
-		try {
-			Thread.sleep(30000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		stopMyo();
-		parseMyoData();
-		System.out.println("Total Time: " + totalTime);
-		System.out.println("Small Movement Time: " + smallMovementTime);
-		System.out.println("Big Movement Time: " + bigMovementTime);
-		
-		double total = 0, small = 0, big = 0;
-		
-		for (int i = 0; i < movementGraph.length; i++)
-		{
-			if (movementGraph[i] == 0)
-			{
-				total++;
-			}
-			
-			else if (movementGraph[i] == 1)
-			{
-				small++;
-			}
-			
-			else if (movementGraph[i] == 2)
-			{
-				big++;
-			}
-		}
-		
-		System.out.println("New No Movement Time: " + (total/10.0));
-		System.out.println("New Small Movement Time: " + (small/10.0));
-		System.out.println("New Big Movement Time: " + (big/10.0));
-	}
+//	public static void main(String[] args)
+//	{
+//		executeMyo();
+//		try {
+//			Thread.sleep(30000);
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		stopMyo();
+//		parseMyoData();
+//		System.out.println("Total Time: " + totalTime);
+//		System.out.println("Small Movement Time: " + smallMovementTime);
+//		System.out.println("Big Movement Time: " + bigMovementTime);
+//		
+//		
+//		
+//		System.out.println("New No Movement Time: " + (total/10.0));
+//		System.out.println("New Small Movement Time: " + (small/10.0));
+//		System.out.println("New Big Movement Time: " + (big/10.0));
+//	}
 
 	public static String combineStrings(List<SpeechResults> results) {
 		String speech = "";
