@@ -34,105 +34,106 @@ const short LARGE_MOVEMENT = 2;
 // default behavior is to do nothing.
 class DataCollector : public myo::DeviceListener {
 public:
-    DataCollector()
-    : onArm(false), isUnlocked(false), roll_w(0), pitch_w(0), yaw_w(0), currentPose()
-    {
-		
-    }
+	DataCollector()
+		: onArm(false), isUnlocked(false), roll_w(0), pitch_w(0), yaw_w(0), currentPose()
+	{
 
-    // onUnpair() is called whenever the Myo is disconnected from Myo Connect by the user.
-    void onUnpair(myo::Myo* myo, uint64_t timestamp)
-    {
-        // We've lost a Myo.
-        // Let's clean up some leftover state.
-        roll_w = 0;
-        pitch_w = 0;
-        yaw_w = 0;
-        onArm = false;
-        isUnlocked = false;
-    }
+	}
 
-    // onOrientationData() is called whenever the Myo device provides its current orientation, which is represented
-    // as a unit quaternion.
-    void onOrientationData(myo::Myo* myo, uint64_t timestamp, const myo::Quaternion<float>& quat)
-    {
-        using std::atan2;
-        using std::asin;
-        using std::sqrt;
-        using std::max;
-        using std::min;
+	// onUnpair() is called whenever the Myo is disconnected from Myo Connect by the user.
+	void onUnpair(myo::Myo* myo, uint64_t timestamp)
+	{
+		// We've lost a Myo.
+		// Let's clean up some leftover state.
+		roll_w = 0;
+		pitch_w = 0;
+		yaw_w = 0;
+		onArm = false;
+		isUnlocked = false;
+	}
 
-        // Calculate Euler angles (roll, pitch, and yaw) from the unit quaternion.
-        float roll = atan2(2.0f * (quat.w() * quat.x() + quat.y() * quat.z()),
-                           1.0f - 2.0f * (quat.x() * quat.x() + quat.y() * quat.y()));
-        float pitch = asin(max(-1.0f, min(1.0f, 2.0f * (quat.w() * quat.y() - quat.z() * quat.x()))));
-        float yaw = atan2(2.0f * (quat.w() * quat.z() + quat.x() * quat.y()),
-                        1.0f - 2.0f * (quat.y() * quat.y() + quat.z() * quat.z()));
+	// onOrientationData() is called whenever the Myo device provides its current orientation, which is represented
+	// as a unit quaternion.
+	void onOrientationData(myo::Myo* myo, uint64_t timestamp, const myo::Quaternion<float>& quat)
+	{
+		using std::atan2;
+		using std::asin;
+		using std::sqrt;
+		using std::max;
+		using std::min;
 
-        // Convert the floating point angles in radians to a scale from 0 to 18.
-        roll_w = static_cast<int>((roll + (float)M_PI)/(M_PI * 2.0f) * SENSITIVITY);
-        pitch_w = static_cast<int>((pitch + (float)M_PI/2.0f)/M_PI * SENSITIVITY);
-        yaw_w = static_cast<int>((yaw + (float)M_PI)/(M_PI * 2.0f) * SENSITIVITY);
-    }
+		// Calculate Euler angles (roll, pitch, and yaw) from the unit quaternion.
+		float roll = atan2(2.0f * (quat.w() * quat.x() + quat.y() * quat.z()),
+			1.0f - 2.0f * (quat.x() * quat.x() + quat.y() * quat.y()));
+		float pitch = asin(max(-1.0f, min(1.0f, 2.0f * (quat.w() * quat.y() - quat.z() * quat.x()))));
+		float yaw = atan2(2.0f * (quat.w() * quat.z() + quat.x() * quat.y()),
+			1.0f - 2.0f * (quat.y() * quat.y() + quat.z() * quat.z()));
 
-    // onPose() is called whenever the Myo detects that the person wearing it has changed their pose, for example,
-    // making a fist, or not making a fist anymore.
-    void onPose(myo::Myo* myo, uint64_t timestamp, myo::Pose pose)
-    {
-        currentPose = pose;
+		// Convert the floating point angles in radians to a scale from 0 to 18.
+		roll_w = static_cast<int>((roll + (float)M_PI) / (M_PI * 2.0f) * SENSITIVITY);
+		pitch_w = static_cast<int>((pitch + (float)M_PI / 2.0f) / M_PI * SENSITIVITY);
+		yaw_w = static_cast<int>((yaw + (float)M_PI) / (M_PI * 2.0f) * SENSITIVITY);
+	}
 
-        if (pose != myo::Pose::unknown && pose != myo::Pose::rest) {
-            // Tell the Myo to stay unlocked until told otherwise. We do that here so you can hold the poses without the
-            // Myo becoming locked.
-            myo->unlock(myo::Myo::unlockHold);
+	// onPose() is called whenever the Myo detects that the person wearing it has changed their pose, for example,
+	// making a fist, or not making a fist anymore.
+	void onPose(myo::Myo* myo, uint64_t timestamp, myo::Pose pose)
+	{
+		currentPose = pose;
 
-            // Notify the Myo that the pose has resulted in an action, in this case changing
-            // the text on the screen. The Myo will vibrate.
-            myo->notifyUserAction();
-        } else {
-            // Tell the Myo to stay unlocked only for a short period. This allows the Myo to stay unlocked while poses
-            // are being performed, but lock after inactivity.
-            myo->unlock(myo::Myo::unlockTimed);
-        }
-    }
+		if (pose != myo::Pose::unknown && pose != myo::Pose::rest) {
+			// Tell the Myo to stay unlocked until told otherwise. We do that here so you can hold the poses without the
+			// Myo becoming locked.
+			myo->unlock(myo::Myo::unlockHold);
 
-    // onArmSync() is called whenever Myo has recognized a Sync Gesture after someone has put it on their
-    // arm. This lets Myo know which arm it's on and which way it's facing.
-    void onArmSync(myo::Myo* myo, uint64_t timestamp, myo::Arm arm, myo::XDirection xDirection, float rotation,
-                   myo::WarmupState warmupState)
-    {
-        onArm = true;
-        whichArm = arm;
-    }
+			// Notify the Myo that the pose has resulted in an action, in this case changing
+			// the text on the screen. The Myo will vibrate.
+			myo->notifyUserAction();
+		}
+		else {
+			// Tell the Myo to stay unlocked only for a short period. This allows the Myo to stay unlocked while poses
+			// are being performed, but lock after inactivity.
+			myo->unlock(myo::Myo::unlockTimed);
+		}
+	}
 
-    // onArmUnsync() is called whenever Myo has detected that it was moved from a stable position on a person's arm after
-    // it recognized the arm. Typically this happens when someone takes Myo off of their arm, but it can also happen
-    // when Myo is moved around on the arm.
-    void onArmUnsync(myo::Myo* myo, uint64_t timestamp)
-    {
-        onArm = false;
-    }
+	// onArmSync() is called whenever Myo has recognized a Sync Gesture after someone has put it on their
+	// arm. This lets Myo know which arm it's on and which way it's facing.
+	void onArmSync(myo::Myo* myo, uint64_t timestamp, myo::Arm arm, myo::XDirection xDirection, float rotation,
+		myo::WarmupState warmupState)
+	{
+		onArm = true;
+		whichArm = arm;
+	}
 
-    // onUnlock() is called whenever Myo has become unlocked, and will start delivering pose events.
-    void onUnlock(myo::Myo* myo, uint64_t timestamp)
-    {
-        isUnlocked = true;
-    }
+	// onArmUnsync() is called whenever Myo has detected that it was moved from a stable position on a person's arm after
+	// it recognized the arm. Typically this happens when someone takes Myo off of their arm, but it can also happen
+	// when Myo is moved around on the arm.
+	void onArmUnsync(myo::Myo* myo, uint64_t timestamp)
+	{
+		onArm = false;
+	}
 
-    // onLock() is called whenever Myo has become locked. No pose events will be sent until the Myo is unlocked again.
-    void onLock(myo::Myo* myo, uint64_t timestamp)
-    {
-        isUnlocked = false;
-    }
+	// onUnlock() is called whenever Myo has become unlocked, and will start delivering pose events.
+	void onUnlock(myo::Myo* myo, uint64_t timestamp)
+	{
+		isUnlocked = true;
+	}
 
-    // There are other virtual functions in DeviceListener that we could override here, like onAccelerometerData().
-    // For this example, the functions overridden above are sufficient.
+	// onLock() is called whenever Myo has become locked. No pose events will be sent until the Myo is unlocked again.
+	void onLock(myo::Myo* myo, uint64_t timestamp)
+	{
+		isUnlocked = false;
+	}
 
-    // We define this function to print the current values that were updated by the on...() functions above.
-    void print()
-    {
-		
-    }
+	// There are other virtual functions in DeviceListener that we could override here, like onAccelerometerData().
+	// For this example, the functions overridden above are sufficient.
+
+	// We define this function to print the current values that were updated by the on...() functions above.
+	void print()
+	{
+
+	}
 
 	void collectData()
 	{
@@ -172,14 +173,13 @@ public:
 					mylist.push_back(new MovementData(LARGE_MOVEMENT));
 				}
 
-				std::cout << "Big Change: " << big_change << std::endl;
+				// std::cout << "Big Change: " << big_change << std::endl;
 			}
 
 
 			else
 			{
 
-				
 				if ((((roll_w - past_roll) - (past_roll - super_past_roll)) / (REFRESH_RATE * REFRESH_RATE)) > ACCELERATION_THRESHOLD)
 				{
 					if (std::abs(roll_w - past_roll) > (int)(SENSITIVITY * SMALL_PERCENT_THRESHOLD))
@@ -213,13 +213,13 @@ public:
 							mylist.push_back(new MovementData(SMALL_MOVEMENT));
 						}
 
-						std::cout << "Small Change: " << small_change << std::endl;
+						// std::cout << "Small Change: " << small_change << std::endl;
 					}
 				}
 
-			
 
-		}
+
+			}
 		}
 		// no movement
 		if (!big_movement && !movement){
@@ -294,7 +294,7 @@ void loop(){
 		// publishing your application. The Hub provides access to one or more Myos.
 		myo::Hub hub("com.example.hello-myo");
 
-		std::cout << "Attempting to find a Myo..." << std::endl;
+		// std::cout << "Attempting to find a Myo..." << std::endl;
 
 		// Next, we attempt to find a Myo to use. If a Myo is already paired in Myo Connect, this will return that Myo
 		// immediately.
@@ -308,7 +308,7 @@ void loop(){
 		}
 
 		// We've found a Myo.
-		std::cout << "Connected to a Myo armband!" << std::endl << std::endl;
+		// std::cout << "Connected to a Myo armband!" << std::endl << std::endl;
 
 		// Next we construct an instance of our DeviceListener, so that we can register it with the Hub.
 		DataCollector collector;
@@ -318,7 +318,7 @@ void loop(){
 		hub.addListener(&collector);
 
 		// Finally we enter our main loop.
-
+		time_t start = time(NULL);
 		while (!stop)
 		{
 			// In each iteration of our main loop, we run the Myo event loop for a set number of milliseconds.
@@ -329,19 +329,25 @@ void loop(){
 			collector.collectData();
 		}
 
-		std::list<DataCollector::MovementData*>::iterator it = collector.mylist.begin();
+		time_t end = time(NULL);
+		std::cout << difftime(end, start) << std::endl;
+		// total change times
+		std::cout << collector.small_change << std::endl;
+		std::cout << collector.big_change << std::endl;
 
+		std::list<DataCollector::MovementData*>::iterator it = collector.mylist.begin();
+		/*
 		for (; it != collector.mylist.end(); it++)
 		{
 			std::cout << "Movement Type: " << (DataCollector::MovementData*)(*it)->getMovementType();
 			std::cout << "       Length: " << (DataCollector::MovementData*)(*it)->getLength() << std::endl;
-		}
+		} */
 
-		it = collector.mylist.begin();
+		// it = collector.mylist.begin();
 
 		DataCollector::MovementData* past_data = *it;
 		it++;
-		std::cout << std::endl << std::endl;
+		// std::cout << std::endl << std::endl;
 		while (it != collector.mylist.end())
 		{
 			DataCollector::MovementData* present_data = *it;
@@ -383,44 +389,33 @@ void loop(){
 			}
 		}
 
-		std::cout << std::endl << std::endl;
+		// std::cout << std::endl << std::endl;
 		it = collector.mylist.begin();
 		for (; it != collector.mylist.end(); it++)
 		{
-			std::cout << "Movement Type: " << (DataCollector::MovementData*)(*it)->getMovementType();
-			std::cout << "       Length: " << (DataCollector::MovementData*)(*it)->getLength() << std::endl;
-		}
+			// std::cout << "Movement Type: " << (DataCollector::MovementData*)(*it)->getMovementType();
+			// std::cout << "       Length: " << (DataCollector::MovementData*)(*it)->getLength() << std::endl;
+
+			printf("%d\n", (DataCollector::MovementData*)(*it)->getMovementType());
+			printf("%d\n", (DataCollector::MovementData*)(*it)->getLength());
+		} 
 		// If a standard exception occurred, we print out its message and exit.
 	}
 	catch (const std::exception& e) {
 		std::cerr << "Error: " << e.what() << std::endl;
 		std::cerr << "Press enter to continue.";
 		std::cin.ignore();
-		
+
 	}
 }
 
 
 int main(int argc, char** argv)
 {
-	time_t start = time(NULL);
 	std::thread first(loop);
 	std::cin.get();
 	stop = true;
 	first.join();
-    
-
-
-
-	time_t end = time(NULL);
-
-
-
-	std::cout << difftime(end, start) << std::endl;
-
-	
-
-
-
+	std::cin.get();
 	return 0;
 }
