@@ -32,6 +32,7 @@ public class MicRunnable implements Runnable {
 	String speech = "";
 
 	public void finish() throws IOException {
+		System.out.println("STOP");
 		microphone.stop();
 		microphone.close();
 		inputStream.close();
@@ -56,11 +57,16 @@ public class MicRunnable implements Runnable {
 			service.setUsernameAndPassword(WATSON_USERNAME, WATSON_PASSWORD);
 			SpeechSession session = service.createSession();
 			int offset = 0;
+			int totalBytes = 0;
 			while (true) {
 				int numBytesRead = inputStream.read(data);
-				System.out.println(numBytesRead);
-				volumes.add(Utilities.calculateRMSLevel(data));
+				totalBytes += numBytesRead;
+				System.out.println(totalBytes);
+				int volume = Utilities.calculateRMSLevel(data);
+				volumes.add(volume);
+				System.out.println("V " + volume);
 				if (numBytesRead == 0 && out.size() > 100) {
+					System.out.println("In watson end");
 					AudioInputStream outInputStream = new AudioInputStream(
 							new ByteArrayInputStream(out.toByteArray()),
 							format, out.size() / format.getFrameSize());
@@ -73,8 +79,9 @@ public class MicRunnable implements Runnable {
 					break;
 				}
 				out.write(data);
-				if (offset == 8) {
+				if (offset == 64) {
 					offset = -1;
+					System.out.println("In watson");
 					AudioInputStream outInputStream = new AudioInputStream(
 							new ByteArrayInputStream(out.toByteArray()),
 							format, out.size() / format.getFrameSize());
