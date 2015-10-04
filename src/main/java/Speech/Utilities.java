@@ -242,6 +242,10 @@ double total = 0, small = 0, big = 0;
 		return (int)(0.5*speechGrade + 0.15*movementGrade() + 0.1 *volumeGrade + 0.1*concentrationGrade + .15*toneGrade);
 	}
 	
+	public static String getOverallAdvice(){
+		return getMovementAdvice() + "\n\n" + getVolumeAdvice();
+	}
+	
 	public static String numericToLetterGrade(int grade){
 		if(grade >= 97){
 			return "A+";
