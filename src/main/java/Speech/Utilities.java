@@ -14,6 +14,7 @@ public class Utilities {
 	public static List<String> myoOutputStrings = new ArrayList<String>();
 	public static int totalTime;
 	public static double smallMovementTime, bigMovementTime;
+	public static double[] movementGraph;
 
 	public static void executeMyo(){
 			try {
@@ -49,9 +50,23 @@ public class Utilities {
 		
 		ArrayList<Double> graphData = new ArrayList<Double>();
 		for(int i = 3; i < myoOutputStrings.size(); i+=2){
-			
+			double movementType = Double.parseDouble(myoOutputStrings.get(i));
+			int length = Integer.parseInt(myoOutputStrings.get(++i));
+			for(int j = 0; j < length; j++){
+				graphData.add(movementType);
+			}
+		}
+	
+		movementGraph = new double[graphData.size()];
+		for(int i = 0; i < movementGraph.length; i++){
+			movementGraph[i] = graphData.get(i);
 		}
 	}
+	
+	public static int getTotalTime(){ return totalTime; }
+	public static double getSmallMovementTime(){ return smallMovementTime; }
+	public static double getBigMovementTime(){ return bigMovementTime; }
+	public static double[] getMovementGraphArray(){ return movementGraph; }
 
 
 	public static void main(String[] args) {
