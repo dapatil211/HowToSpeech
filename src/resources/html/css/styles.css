@@ -1,0 +1,46 @@
+/**
+ * File: styles.css
+ * Author: cookiesui
+ * Date: 03 September 2015
+ * Description: Style rules for index.html
+ */
+
+body
+{
+	background-color: #E8E1F2;
+}
+
+.btn-record
+{
+	background-color: #6F5499;
+	border-color: #E8E1F2;
+
+	color: #E3DDED;
+}
+
+.header
+{
+	background-color: #6F5499;
+	padding: 40px;
+	margin-top: 50px;
+
+	font-size: 24px;
+	color: #E3DDED;
+	text-shadow: 0 1px 1px rgba(0, 0, 0, .5);
+}
+
+.title
+{
+	font-size: 50px;
+	color: #FFF;
+}
+
+#start-instructions
+{
+	display: block;
+}
+
+#stop-instructions
+{
+	display: none;
+}
