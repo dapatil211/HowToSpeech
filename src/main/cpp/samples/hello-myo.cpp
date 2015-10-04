@@ -171,6 +171,7 @@ public:
 				std::cout << "Big Change: " << big_change << std::endl;
 			}
 
+
 			else
 			{
 
@@ -211,25 +212,25 @@ public:
 						std::cout << "Small Change: " << small_change << std::endl;
 					}
 				}
-			}
-			// no movement
-			if (!big_movement && !movement){
-				if (!mylist.empty()){
-					if (mylist.back()->getMovementType() == NO_MOVEMENT){
-						mylist.back()->addLength();
-					}
-					else{
-						mylist.push_back(new MovementData(NO_MOVEMENT));
-					}
+
+			
+
+		}
+		}
+		// no movement
+		if (!big_movement && !movement){
+			if (!mylist.empty()){
+				if (mylist.back()->getMovementType() == NO_MOVEMENT){
+					mylist.back()->addLength();
 				}
 				else{
 					mylist.push_back(new MovementData(NO_MOVEMENT));
 				}
 			}
-			
-
+			else{
+				mylist.push_back(new MovementData(NO_MOVEMENT));
+			}
 		}
-
 		super_past_roll = past_roll;
 		super_past_pitch = past_pitch;
 		super_past_yaw = past_yaw;
