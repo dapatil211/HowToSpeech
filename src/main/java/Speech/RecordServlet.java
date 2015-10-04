@@ -89,7 +89,7 @@ double[] dummy = {4, 28, 46, 38, 36, 38, 40, 29, 10, 8, 14, 15, 11, 11};
 			retVal.put("volume_graph", getVolumeChart(volumes));
 			retVal.put("concentration_graph", getConcentrationChart(dummy));
 			retVal.put("tone", tone);
-			retVal.put("grade", movementGrade);
+			retVal.put("grade", Utilities.numericToLetterGrade(Utilities.getOverallGrade(90, Utilities.volumeGrader(tempVols),90, 60)));
 			retVal.put("details", details);
 
 			resp.getWriter().write(gson.toJson(retVal));
