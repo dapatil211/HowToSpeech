@@ -32,7 +32,24 @@ public class RecordServlet extends HttpServlet {
 			threads.get(id).isRunning = false;
 			Map<String, Long> retVal = new HashMap<String, Long>();
 			retVal.put("user_id", id);
+
+
+			// Set appropriately based on Watson and our own processing
+			String speech = "Lorem ipsum"; // Speech text
+			String movements = "images/random_walk.png"; // Path to generated movement graph
+			String volume = "images/decibels.gif"; // Path to generated volume graph
+			String personality = "You're angry"; // Personality report
+			String grade = "A-"; // Speech grade
+			String details = "Try waving your arms less." // Suggestions
+
+			retVal.put("speech", speech);
+			retVal.put("movement_graph", movement);
+			retVal.put("volume_graph", volume);
+			retVal.put("personality", personality);
+			retVal.put("grade", grade);
+			retVal.put("details", details);
+
 			resp.getWriter().write(gson.toJson(retVal));
-			}
+		}
 	}
 }
