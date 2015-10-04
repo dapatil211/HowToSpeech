@@ -25,33 +25,40 @@ import com.googlecode.charts4j.LineStyle;
 import com.googlecode.charts4j.LinearGradientFill;
 import com.googlecode.charts4j.Plots;
 
-import com.googlecode.charts4j.Color.*;
-import com.googlecode.charts4j.UrlUtil.normalize;
-
 public class RecordServlet extends HttpServlet {
 	Map<Long, MicRunnable> threads = new HashMap<Long, MicRunnable>();
+	Map<MicRunnable, Thread> runnableToThreads = new HashMap<MicRunnable, Thread>();
 	private final static Gson gson = new Gson();
 
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 		String action = req.getParameter("action");
 		if ("start".equals(action)) {
-			Utilities.executeMyo();
+//			Utilities.executeMyo();
 			MicRunnable micRunnable = new MicRunnable();
 			Thread micThread = new Thread(micRunnable);
 			micThread.start();
 			threads.put(micThread.getId(), micRunnable);
+			runnableToThreads.put(micRunnable, micThread);
 			Map<String, Long> retVal = new HashMap<String, Long>();
 			retVal.put("user_id", micThread.getId());
 			resp.getWriter().write(gson.toJson(retVal));
 		}
 		else if("stop".equals(action)){
-			Utilities.stopMyo();
-			Utilities.parseMyoData();
-			double[] movement = Utilities.getMovementGraphArray();
+//			Utilities.stopMyo();
+//			Utilities.parseMyoData();
+//			double[] movement = Utilities.getMovementGraphArray();
 			long id = Long.parseLong(req.getParameter("user_id"));
 			MicRunnable micRunnable = threads.get(id);
 			micRunnable.finish();
+			Thread thread = runnableToThreads.get(micRunnable);
+			try {
+				thread.join();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			System.out.println("Stuff");
 			List<Integer> tempVols = micRunnable.volumes;
 			double[] volumes = new double[tempVols.size()];
 			for(int i = 0; i < tempVols.size(); i ++){
@@ -63,10 +70,10 @@ public class RecordServlet extends HttpServlet {
 	
 	
 	// Hacky solution: scale the data up to match the graph scales, which I have trouble changing
-	for (int i = 0; i < movement.length; ++i)
-	{
-		movement[i] *= 50;
-	}
+//	for (int i = 0; i < movement.length; ++i)
+//	{
+//		movement[i] *= 50;
+//	}
 	
 	for (int i = 0; i < volumes.length; ++i)
 	{
@@ -78,12 +85,12 @@ public class RecordServlet extends HttpServlet {
 			// Set appropriately based on Watson and our own processing
 			String speech = micRunnable.speech; //TODO // Speech text
 			String tone = "You're angry"; // Personality report
-			String volumeGrade = Utilities.numericToLetterGrade(Utilities.volumeGrader(tempVols)); // Speech grade
+//			String volumeGrade = Utilities.numericToLetterGrade(Utilities.volumeGrader(tempVols)); // Speech grade
 			String movementGrade = Utilities.numericToLetterGrade(Utilities.movementGrade());
 			String details = "Try waving your arms less."; // Suggestions
 
 			retVal.put("speech", speech);
-			retVal.put("movement_graph", getMovementChart(movement));
+//			retVal.put("movement_graph", getMovementChart(movement));
 			retVal.put("volume_graph", getVolumeChart(volumes));
 			retVal.put("tone", tone);
 			retVal.put("grade", movementGrade);
@@ -93,53 +100,6 @@ public class RecordServlet extends HttpServlet {
 		}
 	}
 
-<<<<<<< HEAD
-	String getMovementChart (int[] movPts) {
-
-        // Defining lines
-        Line line = Plots.newLine(Data.newData(movPts), Color.newColor("CA3D05"), "Movements");
-        line.setLineStyle(LineStyle.newLineStyle(3, 1, 0));
-        // line.addShapeMarkers(Shape.DIAMOND, Color.newColor("CA3D05"), 12);
-        // line.addShapeMarkers(Shape.DIAMOND, Color.WHITE, 8);
-
-        // Defining chart.
-        LineChart chart = GCharts.newLineChart(line);
-        chart.setSize(450, 800);
-        chart.setTitle("Your Movements", WHITE, 14);
-        chart.setGrid(25, 25, 3, 2);
-
-        // Defining axis info and styles
-        AxisStyle axisStyle = AxisStyle.newAxisStyle(WHITE, 12, AxisTextAlignment.CENTER);
-        AxisLabels xAxis = AxisLabelsFactory.newAxisLabels("Nov", "Dec", "Jan", "Feb", "Mar");
-        xAxis.setAxisStyle(axisStyle);
-        AxisLabels xAxis2 = AxisLabelsFactory.newAxisLabels("2007", "2007", "2008", "2008", "2008");
-        xAxis2.setAxisStyle(axisStyle);
-        AxisLabels yAxis = AxisLabelsFactory.newAxisLabels("", "25", "50", "75", "100");
-        AxisLabels xAxis3 = AxisLabelsFactory.newAxisLabels("Month", 50.0);
-        xAxis3.setAxisStyle(AxisStyle.newAxisStyle(WHITE, 14, AxisTextAlignment.CENTER));
-        yAxis.setAxisStyle(axisStyle);
-        AxisLabels yAxis2 = AxisLabelsFactory.newAxisLabels("Hits", 50.0);
-        yAxis2.setAxisStyle(AxisStyle.newAxisStyle(WHITE, 14, AxisTextAlignment.CENTER));
-        yAxis2.setAxisStyle(axisStyle);
-
-        // Adding axis info to chart.
-        chart.addXAxisLabels(xAxis);
-        chart.addXAxisLabels(xAxis2);
-        chart.addXAxisLabels(xAxis3);
-        chart.addYAxisLabels(yAxis);
-        chart.addYAxisLabels(yAxis2);
-
-        // Defining background and chart fills.
-        chart.setBackgroundFill(Fills.newSolidFill(Color.newColor("1F1D1D")));
-        LinearGradientFill fill = Fills.newLinearGradientFill(0, Color.newColor("363433"), 100);
-        fill.addColorAndOffset(Color.newColor("2E2B2A"), 0);
-        chart.setAreaFill(fill);
-        String url = chart.toURLString();
-
-        System.err.println(url);
-
-        return url;
-=======
 	String getMovementChart (double[] movPts) {
 		// Defining lines
 		Line line = Plots.newLine(Data.newData(movPts), Color.newColor("CA3D05"), "Movements");
@@ -208,6 +168,5 @@ public class RecordServlet extends HttpServlet {
 		System.err.println(url);
 
 		return url;
->>>>>>> 5054388c573fa0f5891a7c4a31dfa8ab4423e13c
 	}
 }

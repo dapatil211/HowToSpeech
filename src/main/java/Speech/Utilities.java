@@ -269,7 +269,7 @@ double total = 0, small = 0, big = 0;
 		for (SpeechResults result : results) {
 			List<Transcript> transcripts = result.getResults();
 			for (Transcript transcript : transcripts) {
-				transcript.getAlternatives().get(0).getTranscript();
+				speech += transcript.getAlternatives().get(0).getTranscript();
 			}
 		}
 		return speech;

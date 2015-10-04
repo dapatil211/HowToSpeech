@@ -27,7 +27,7 @@ public class MicRunnable implements Runnable {
 	private static final String WATSON_USERNAME = "21d3a7d1-b2c5-471b-a66c-d20885130dda";
 
 	TargetDataLine microphone = null;
-	AudioInputStream inputStream =null;
+	AudioInputStream inputStream = null;
 	List<Integer> volumes = null;
 	String speech = "";
 
@@ -60,7 +60,7 @@ public class MicRunnable implements Runnable {
 				int numBytesRead = inputStream.read(data);
 				System.out.println(numBytesRead);
 				volumes.add(Utilities.calculateRMSLevel(data));
-				if (numBytesRead == 0) {
+				if (numBytesRead == 0 && out.size() > 100) {
 					AudioInputStream outInputStream = new AudioInputStream(
 							new ByteArrayInputStream(out.toByteArray()),
 							format, out.size() / format.getFrameSize());
@@ -69,7 +69,7 @@ public class MicRunnable implements Runnable {
 					AudioSystem.write(outInputStream,
 							AudioFileFormat.Type.WAVE, fileOut);
 					SpeechResults transcript = textToSpeech(service, fileOut);
-					transcripts.add(transcript);
+					if(transcript != null){transcripts.add(transcript);};
 					break;
 				}
 				out.write(data);
@@ -90,10 +90,13 @@ public class MicRunnable implements Runnable {
 			String text = Utilities.combineStrings(transcripts);
 			speech = text;
 			System.out.println(text);
-			Map<String, String> params = new HashMap<String, String>();
-			params.put("body", text);
-			Map<String, String> res = Utilities.sendRequest("https://stream.watsonplatform.net/tone-analyzer-experimental/api/v1/tone", params);
-			System.out.println(res);
+//			Map<String, String> params = new HashMap<String, String>();
+//			params.put("body", text);
+//			Map<String, String> res = Utilities
+//					.sendRequest(
+//							"https://stream.watsonplatform.net/tone-analyzer-experimental/api/v1/tone",
+//							params);
+//			System.out.println(res);
 			System.out.println(volumes);
 		} catch (IOException ex) {
 			// Handle the error ...
@@ -112,7 +115,11 @@ public class MicRunnable implements Runnable {
 		params.put("timestamps", true);
 		params.put("inactivity_timeout", 30);
 		params.put("max_alternatives", 1);
-		SpeechResults transcript = service.recognize(params);
+		SpeechResults transcript = null;
+		try {
+			transcript = service.recognize(params);
+		} catch (Exception e) {
+		}
 		System.out.println("Watson request");
 		return transcript;
 	}
