@@ -347,7 +347,7 @@ void loop(){
 
 		DataCollector::MovementData* past_data = *it;
 		it++;
-		std::cout << std::endl << std::endl;
+		// std::cout << std::endl << std::endl;
 		while (it != collector.mylist.end())
 		{
 			DataCollector::MovementData* present_data = *it;
@@ -389,7 +389,7 @@ void loop(){
 			}
 		}
 
-		std::cout << std::endl << std::endl;
+		// std::cout << std::endl << std::endl;
 		it = collector.mylist.begin();
 		for (; it != collector.mylist.end(); it++)
 		{
