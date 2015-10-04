@@ -56,7 +56,7 @@ public class MicRunnable implements Runnable {
 					break;
 				}
 				out.write(data);
-				if (offset == 14) {
+				if (offset == 8) {
 					offset = -1;
 					AudioInputStream outInputStream = new AudioInputStream(
 							new ByteArrayInputStream(out.toByteArray()),
@@ -82,12 +82,13 @@ public class MicRunnable implements Runnable {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("audio", fileOut);
 		params.put("content_type", "audio/wav");
-		params.put("word_confidence", false);
+		params.put("word_confidence", true);
 		params.put("continuous", true);
 		params.put("timestamps", true);
 		params.put("inactivity_timeout", 30);
 		params.put("max_alternatives", 1);
 		SpeechResults transcript = service.recognize(params);
+		System.out.println("Watson request");
 		return transcript;
 	}
 }
