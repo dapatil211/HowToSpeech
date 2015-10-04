@@ -25,8 +25,8 @@ $(document).ready(function(){
 function startRecord ()
 {
 	$.get(BASE_URL+"record", {action:"start"}, function(data){
-    id = data["user_id"];
-  }, "json");
+    	id = data["user_id"];
+  	}, "json");
 
 	$("#"+START_P_ID)[0].style.display = "none";
 	$("#"+STOP_P_ID)[0].style.display = "block";
@@ -35,14 +35,20 @@ function startRecord ()
 function stopRecord ()
 {
 	$.get(BASE_URL+"record", {action:"stop", user_id:id}, function(data){
-    writeResults(data);
-  }, "json");
+    	writeResults(data);
+	}, "json");
 
 	$("#"+STOP_P_ID)[0].style.display = "none";
 	$("#"+START_P_ID)[0].style.display = "block";
+	$("#main")[0].style.visibility = "visible";
 }
 
 function writeResults (data)
 {
-
+	$("#speech_txt").val(data["speech"]);
+	$("#movements_img").attr("src", data["movement_graph"]);
+	$("#volume_img").attr("src", data["volume_graph"]);
+	$("#tone_txt").text(data["tone"]);
+	$("#grade_txt").text("Your Grade: " + data["grade"]);
+	$("#details_txt").text(data["details"]);
 }

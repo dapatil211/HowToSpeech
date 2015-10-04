@@ -47,21 +47,21 @@
 
 				<div class="col-md-2"></div>
 
-				<div class="col-md-8">
-					<h2>${speech.text}</h2>
-					<textarea class="form-control">Lorem ipsum</textarea>
+				<div class="col-md-8" id="main">
+					<h2>Your Speech</h2>
+					<textarea class="form-control" id="speech_txt"></textarea>
 					
 					<h2>Your Movements</h2>
-					<img src="${movements.img}">
+					<img id="movements_img">
 
 					<h2>Your Volume</h2>
-					<img src="${volume.img}">
+					<img id="volume_img">
 
-					<h2>Your Personality</h2>
-					<p>${personality.text}</p>
+					<h2>Your Tone</h2>
+					<p id="tone_txt"></p>
 
-					<h2>Your Grade: ${grade.text}</h2>
-					<p>${grade.text}</p>
+					<h2 id="grade_txt">Your Grade: </h2>
+					<p id="details_txt"></p>
 				</div>
 
 				<div class="col-md-2"></div>
