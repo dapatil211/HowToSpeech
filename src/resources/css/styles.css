@@ -29,7 +29,7 @@ body
 
 	font-size: 24px;
 	color: #E3DDED;
-	text-shadow: 0 2px 2px rgba(0, 0, 0, .32);
+	text-shadow: 0 1px 1px rgba(0, 0, 0, .5);
 }
 
 .title
