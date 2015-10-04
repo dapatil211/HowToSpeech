@@ -10,9 +10,19 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.google.gson.Gson;
-
-import com.googlecode.charts4j.Color.*;
-import com.googlecode.charts4j.UrlUtil.normalize;
+import com.googlecode.charts4j.AxisLabels;
+import com.googlecode.charts4j.AxisLabelsFactory;
+import com.googlecode.charts4j.AxisStyle;
+import com.googlecode.charts4j.AxisTextAlignment;
+import com.googlecode.charts4j.Color;
+import com.googlecode.charts4j.Data;
+import com.googlecode.charts4j.Fills;
+import com.googlecode.charts4j.GCharts;
+import com.googlecode.charts4j.Line;
+import com.googlecode.charts4j.LineChart;
+import com.googlecode.charts4j.LineStyle;
+import com.googlecode.charts4j.LinearGradientFill;
+import com.googlecode.charts4j.Plots;
 
 public class RecordServlet extends HttpServlet {
 	Map<Long, MicRunnable> threads = new HashMap<Long, MicRunnable>();
@@ -35,7 +45,8 @@ public class RecordServlet extends HttpServlet {
 			threads.get(id).isRunning = false;
 
 
-
+double[] pts = {1, 2, 3, 4};
+System.out.println(getMovementChart(pts));
 
 			Map<String, String> retVal = new HashMap<String, String>();
 
@@ -58,7 +69,7 @@ public class RecordServlet extends HttpServlet {
 		}
 	}
 
-	String getMovementChart (int[] movPts) {
+	String getMovementChart (double[] movPts) {
 
         // Defining lines
         Line line = Plots.newLine(Data.newData(movPts), Color.newColor("CA3D05"), "Movements");
@@ -68,22 +79,22 @@ public class RecordServlet extends HttpServlet {
 
         // Defining chart.
         LineChart chart = GCharts.newLineChart(line);
-        chart.setSize(450, 800);
-        chart.setTitle("Your Movements", WHITE, 14);
+        chart.setSize(450, 600);
+        chart.setTitle("Your Movements", Color.WHITE, 14);
         chart.setGrid(25, 25, 3, 2);
 
         // Defining axis info and styles
-        AxisStyle axisStyle = AxisStyle.newAxisStyle(WHITE, 12, AxisTextAlignment.CENTER);
+        AxisStyle axisStyle = AxisStyle.newAxisStyle(Color.WHITE, 12, AxisTextAlignment.CENTER);
         AxisLabels xAxis = AxisLabelsFactory.newAxisLabels("Nov", "Dec", "Jan", "Feb", "Mar");
         xAxis.setAxisStyle(axisStyle);
         AxisLabels xAxis2 = AxisLabelsFactory.newAxisLabels("2007", "2007", "2008", "2008", "2008");
         xAxis2.setAxisStyle(axisStyle);
         AxisLabels yAxis = AxisLabelsFactory.newAxisLabels("", "25", "50", "75", "100");
         AxisLabels xAxis3 = AxisLabelsFactory.newAxisLabels("Month", 50.0);
-        xAxis3.setAxisStyle(AxisStyle.newAxisStyle(WHITE, 14, AxisTextAlignment.CENTER));
+        xAxis3.setAxisStyle(AxisStyle.newAxisStyle(Color.WHITE, 14, AxisTextAlignment.CENTER));
         yAxis.setAxisStyle(axisStyle);
         AxisLabels yAxis2 = AxisLabelsFactory.newAxisLabels("Hits", 50.0);
-        yAxis2.setAxisStyle(AxisStyle.newAxisStyle(WHITE, 14, AxisTextAlignment.CENTER));
+        yAxis2.setAxisStyle(AxisStyle.newAxisStyle(Color.WHITE, 14, AxisTextAlignment.CENTER));
         yAxis2.setAxisStyle(axisStyle);
 
         // Adding axis info to chart.
