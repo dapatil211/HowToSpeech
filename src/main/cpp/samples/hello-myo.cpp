@@ -415,5 +415,6 @@ int main(int argc, char** argv)
 	std::cin.get();
 	stop = true;
 	first.join();
+	std::cin.get();
 	return 0;
 }
