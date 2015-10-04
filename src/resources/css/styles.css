@@ -8,6 +8,8 @@
 body
 {
 	background-color: #E8E1F2;
+
+	font-size: 16px;
 }
 
 .btn-record
@@ -21,8 +23,9 @@ body
 .header
 {
 	background-color: #6F5499;
-	padding: 40px;
+	padding: 40px 0;
 	margin-top: 50px;
+	margin-bottom: 25px;
 
 	font-size: 24px;
 	color: #E3DDED;
