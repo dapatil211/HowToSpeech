@@ -54,7 +54,7 @@ public class MicRunnable implements Runnable {
 		params.put("audio", fileOut);
 		params.put("content_type", "audio/wav");
 		params.put("word_confidence", false);
-		params.put("continuous", false);
+		params.put("continuous", true);
 		params.put("timestamps", true);
 		params.put("inactivity_timeout", 30);
 		params.put("max_alternatives", 1);
