@@ -11,6 +11,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.gson.Gson;
 
+import com.googlecode.charts4j.Color.*;
+import com.googlecode.charts4j.UrlUtil.normalize;
+
 public class RecordServlet extends HttpServlet {
 	Map<Long, MicRunnable> threads = new HashMap<Long, MicRunnable>();
 	private final static Gson gson = new Gson();
@@ -49,5 +52,52 @@ public class RecordServlet extends HttpServlet {
 
 			resp.getWriter().write(gson.toJson(retVal));
 		}
+	}
+
+	String getMovementChart (int[] movPts) {
+
+        // Defining lines
+        Line line = Plots.newLine(Data.newData(movPts), Color.newColor("CA3D05"), "Movements");
+        line.setLineStyle(LineStyle.newLineStyle(3, 1, 0));
+        // line.addShapeMarkers(Shape.DIAMOND, Color.newColor("CA3D05"), 12);
+        // line.addShapeMarkers(Shape.DIAMOND, Color.WHITE, 8);
+
+        // Defining chart.
+        LineChart chart = GCharts.newLineChart(line);
+        chart.setSize(450, 800);
+        chart.setTitle("Your Movements", WHITE, 14);
+        chart.setGrid(25, 25, 3, 2);
+
+        // Defining axis info and styles
+        AxisStyle axisStyle = AxisStyle.newAxisStyle(WHITE, 12, AxisTextAlignment.CENTER);
+        AxisLabels xAxis = AxisLabelsFactory.newAxisLabels("Nov", "Dec", "Jan", "Feb", "Mar");
+        xAxis.setAxisStyle(axisStyle);
+        AxisLabels xAxis2 = AxisLabelsFactory.newAxisLabels("2007", "2007", "2008", "2008", "2008");
+        xAxis2.setAxisStyle(axisStyle);
+        AxisLabels yAxis = AxisLabelsFactory.newAxisLabels("", "25", "50", "75", "100");
+        AxisLabels xAxis3 = AxisLabelsFactory.newAxisLabels("Month", 50.0);
+        xAxis3.setAxisStyle(AxisStyle.newAxisStyle(WHITE, 14, AxisTextAlignment.CENTER));
+        yAxis.setAxisStyle(axisStyle);
+        AxisLabels yAxis2 = AxisLabelsFactory.newAxisLabels("Hits", 50.0);
+        yAxis2.setAxisStyle(AxisStyle.newAxisStyle(WHITE, 14, AxisTextAlignment.CENTER));
+        yAxis2.setAxisStyle(axisStyle);
+
+        // Adding axis info to chart.
+        chart.addXAxisLabels(xAxis);
+        chart.addXAxisLabels(xAxis2);
+        chart.addXAxisLabels(xAxis3);
+        chart.addYAxisLabels(yAxis);
+        chart.addYAxisLabels(yAxis2);
+
+        // Defining background and chart fills.
+        chart.setBackgroundFill(Fills.newSolidFill(Color.newColor("1F1D1D")));
+        LinearGradientFill fill = Fills.newLinearGradientFill(0, Color.newColor("363433"), 100);
+        fill.addColorAndOffset(Color.newColor("2E2B2A"), 0);
+        chart.setAreaFill(fill);
+        String url = chart.toURLString();
+
+        System.err.println(url);
+
+        return url;
 	}
 }
