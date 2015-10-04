@@ -48,7 +48,7 @@ function writeResults (data)
 	$("#speech_txt").val(data["speech"]);
 	$("#movements_img").attr("src", data["movement_graph"]);
 	$("#volume_img").attr("src", data["volume_graph"]);
-	$("#personality_txt").text(data["personality"]);
+	$("#tone_txt").text(data["tone"]);
 	$("#grade_txt").text("Your Grade: " + data["grade"]);
 	$("#details_txt").text(data["details"]);
 }

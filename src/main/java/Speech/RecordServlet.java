@@ -64,14 +64,14 @@ public class RecordServlet extends HttpServlet {
 
 			// Set appropriately based on Watson and our own processing
 			String speech = "Lorem ipsum"; // Speech text
-			String personality = "You're angry"; // Personality report
+			String tone = "You're angry"; // Personality report
 			String grade = "A-"; // Speech grade
 			String details = "Try waving your arms less."; // Suggestions
 
 			retVal.put("speech", speech);
 			retVal.put("movement_graph", getMovementChart(pts));
 			retVal.put("volume_graph", getVolumeChart(pts2));
-			retVal.put("personality", personality);
+			retVal.put("tone", tone);
 			retVal.put("grade", grade);
 			retVal.put("details", details);
 
