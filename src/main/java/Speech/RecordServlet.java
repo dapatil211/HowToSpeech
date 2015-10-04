@@ -30,9 +30,7 @@ public class RecordServlet extends HttpServlet {
 		else if("stop".equals(action)){
 			long id = Long.parseLong(req.getParameter("user_id"));
 			threads.get(id).isRunning = false;
-			Map<String, Long> retVal = new HashMap<String, Long>();
-			retVal.put("user_id", id);
-
+			Map<String, String> retVal = new HashMap<String, String>();
 
 			// Set appropriately based on Watson and our own processing
 			String speech = "Lorem ipsum"; // Speech text
@@ -40,10 +38,10 @@ public class RecordServlet extends HttpServlet {
 			String volume = "images/decibels.gif"; // Path to generated volume graph
 			String personality = "You're angry"; // Personality report
 			String grade = "A-"; // Speech grade
-			String details = "Try waving your arms less." // Suggestions
+			String details = "Try waving your arms less."; // Suggestions
 
 			retVal.put("speech", speech);
-			retVal.put("movement_graph", movement);
+			retVal.put("movement_graph", movements);
 			retVal.put("volume_graph", volume);
 			retVal.put("personality", personality);
 			retVal.put("grade", grade);
