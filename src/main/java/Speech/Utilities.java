@@ -34,6 +34,9 @@ public class Utilities {
 	public static int totalTime;
 	public static double smallMovementTime, bigMovementTime;
 	public static double[] movementGraph;
+	public static String movementAdvice;
+	public static boolean volumeLoud;
+	public static int volumeGrade;
 
 	public static void executeMyo(){
 			try {
@@ -125,17 +128,33 @@ double total = 0, small = 0, big = 0;
 		if(getBigMovementTime()/getTotalTime() < 0.2){
 			if(getSmallMovementTime()/getTotalTime() > 0.13){
 				// shaky
+				movementAdvice = "You are quite nervous and extremely fidgety. Try to stand more still.";
 				return 60;
 			}
 			else{
 				// stiff
+				movementAdvice = "You are a bit nervous and stiff as a rock. Loosen up!";
 				return 50;
 			}
 		}
 		else{
-			return (int)(100 - 100*Math.abs(getBigMovementTime()/getTotalTime() - 0.67));
+			if(getBigMovementTime()/getTotalTime() > 0.67){
+				movementAdvice = "You must be very excited, but try waving your arms around less.";
+			}
+			else{
+				movementAdvice = "No harm in being more enthusiastic, try using more arm gestures.";
+			}
+			return (int)(100 - 100*Math.abs(getBigMovementTime()/getTotalTime() - 0.70));
 		}
-		
+	}
+	
+	public static String getMovementAdvice(){
+		if(movementGrade() < 90){
+			return movementAdvice;
+		}
+		else{
+			return "Great, you are in control of your body and arm movements!";
+		}
 	}
 	
 	// golden time: total 120, small 15, big 22
@@ -199,7 +218,32 @@ double total = 0, small = 0, big = 0;
 		}
 		int averageDX = sumDX / volumes.size();
 		
+		if(averageDX > 5){
+			volumeLoud = true;
+		}
+		else{
+			volumeLoud = false;
+		}
+		volumeGrade = (int) (100 - 10*Math.abs(averageDX - 5.0));
+		
 		return (int) (100 - 10*Math.abs(averageDX - 5.0));
+	}
+	
+	public static String getVolumeAdvice(){
+		if(volumeLoud){
+			return "Try varying the volume of your voice less.";
+		}
+		else{
+			return "Try varying the volume of your voice more, your speech is monotone.";
+		}
+	}
+	
+	public static int getOverallGrade(int speechGrade, int volumeGrade, int toneGrade, int concentrationGrade){
+		return (int)(0.5*speechGrade + 0.15*movementGrade() + 0.1 *volumeGrade + 0.1*concentrationGrade + .15*toneGrade);
+	}
+	
+	public static String getOverallAdvice(){
+		return getMovementAdvice() + "\n\n" + getVolumeAdvice();
 	}
 	
 	public static String numericToLetterGrade(int grade){
