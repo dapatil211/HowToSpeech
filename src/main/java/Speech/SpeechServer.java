@@ -10,11 +10,13 @@ public class SpeechServer {
 		Server server = new Server(8080);
 		ServletContextHandler handler = new ServletContextHandler(server, "/");
 		handler.addServlet(RecordServlet.class, "/record");
+		
+		//static files
 		DefaultServlet defaultServlet = new DefaultServlet();
-		ServletHolder holderPwd = new ServletHolder(defaultServlet);
-		holderPwd.setInitParameter("resourceBase", "./src/resources/html");
-
-		handler.addServlet(holderPwd, "/*");
+		ServletHolder staticHolder = new ServletHolder(defaultServlet);
+		staticHolder.setInitParameter("resourceBase", "./src/resources/html");
+		handler.addServlet(staticHolder, "/");
+		
 		server.setHandler(handler);
 		server.start();
 	}
