@@ -9,6 +9,8 @@
 #include <algorithm>
 #include <conio.h>
 #include <time.h>
+#include <list>
+const double REFRESH_RATE = 10.0;
 
 // The only file that needs to be included to use the Myo C++ SDK is myo.hpp.
 #include <myo/myo.hpp>
@@ -16,8 +18,12 @@
 const double SMALL_PERCENT_THRESHOLD = 0.009;
 const double LARGE_PERCENT_THRESHOLD = 0.01;
 const double ACCELERATION_THRESHOLD = 0.0026;
-const double REFRESH_RATE = 10.0;
+const int LENGTH_THRESHOLD = 3;
 const int SENSITIVITY = 100; // Default is 18, higher is more sensitive
+
+const short NO_MOVEMENT = 0;
+const short SMALL_MOVEMENT = 1;
+const short LARGE_MOVEMENT = 2;
 
 // Classes that inherit from myo::DeviceListener can be used to receive events from Myo devices. DeviceListener
 // provides several virtual functions for handling different kinds of events. If you do not override an event, the
@@ -27,6 +33,7 @@ public:
     DataCollector()
     : onArm(false), isUnlocked(false), roll_w(0), pitch_w(0), yaw_w(0), currentPose()
     {
+		
     }
 
     // onUnpair() is called whenever the Myo is disconnected from Myo Connect by the user.
@@ -126,6 +133,7 @@ public:
 	void collectData()
 	{
 		bool big_movement = false;
+		bool movement = false;
 
 		if ((((roll_w - past_roll) - (past_roll - super_past_roll)) / (REFRESH_RATE * REFRESH_RATE) > 0))
 		{
@@ -147,13 +155,26 @@ public:
 			if (big_movement)
 			{
 				big_change += 1.0 / REFRESH_RATE;
+
+				if (!mylist.empty()){
+					if (mylist.back()->getMovementType() == LARGE_MOVEMENT){
+						mylist.back()->addLength();
+					}
+					else{
+						mylist.push_back(new MovementData(LARGE_MOVEMENT));
+					}
+				}
+				else{
+					mylist.push_back(new MovementData(LARGE_MOVEMENT));
+				}
+
 				std::cout << "Big Change: " << big_change << std::endl;
 			}
 
 			else
 			{
 
-				bool movement = false;
+				
 				if ((((roll_w - past_roll) - (past_roll - super_past_roll)) / (REFRESH_RATE * REFRESH_RATE)) > ACCELERATION_THRESHOLD)
 				{
 					if (std::abs(roll_w - past_roll) > (int)(SENSITIVITY * SMALL_PERCENT_THRESHOLD))
@@ -174,10 +195,39 @@ public:
 					if (movement)
 					{
 						small_change += 1.0 / REFRESH_RATE;
+
+						if (!mylist.empty()){
+							if (mylist.back()->getMovementType() == SMALL_MOVEMENT){
+								mylist.back()->addLength();
+							}
+							else{
+								mylist.push_back(new MovementData(SMALL_MOVEMENT));
+							}
+						}
+						else{
+							mylist.push_back(new MovementData(SMALL_MOVEMENT));
+						}
+
 						std::cout << "Small Change: " << small_change << std::endl;
 					}
 				}
 			}
+			// no movement
+			if (!big_movement && !movement){
+				if (!mylist.empty()){
+					if (mylist.back()->getMovementType() == NO_MOVEMENT){
+						mylist.back()->addLength();
+					}
+					else{
+						mylist.push_back(new MovementData(NO_MOVEMENT));
+					}
+				}
+				else{
+					mylist.push_back(new MovementData(NO_MOVEMENT));
+				}
+			}
+			
+
 		}
 
 		super_past_roll = past_roll;
@@ -187,6 +237,33 @@ public:
 		past_pitch = pitch_w;
 		past_yaw = yaw_w;
 	}
+
+	// post-game analysis
+	class MovementData {
+		short movementType;
+		unsigned int length;
+	public:
+		MovementData(short inputMovementType) : movementType(inputMovementType), length(1){};
+		void addLength(){
+			length++;
+		}
+		void appendLength(unsigned int size)
+		{
+			length += size;
+		}
+		unsigned int getLength()
+		{
+			return length;
+		}
+		void setMovementType(short movementType)
+		{
+			this->movementType = movementType;
+		}
+		short getMovementType() { return movementType; }
+	};
+
+	// post-game analysis
+	std::list<MovementData*> mylist;
 
     // These values are set by onArmSync() and onArmUnsync() above.
     bool onArm;
@@ -251,7 +328,71 @@ int main(int argc, char** argv)
     }
 	time_t end = time(NULL);
 
+
+
 	std::cout << difftime(end, start) << std::endl;
+
+	std::list<DataCollector::MovementData*>::iterator it = collector.mylist.begin();
+
+	for (; it != collector.mylist.end(); it++)
+	{
+		std::cout << "Movement Type: " << (DataCollector::MovementData*)(*it)->getMovementType();
+		std::cout << "       Length: " << (DataCollector::MovementData*)(*it)->getLength() << std::endl;
+	}
+
+	it = collector.mylist.begin();
+
+	DataCollector::MovementData* past_data = *it;
+	it++;
+	std::cout << std::endl << std::endl;
+	while(it != collector.mylist.end())
+	{
+		DataCollector::MovementData* present_data = *it;
+		if (((DataCollector::MovementData*)(*it))->getLength() < LENGTH_THRESHOLD)
+		{
+			it++;
+			if (it != collector.mylist.end())
+			{
+				if ((past_data->getMovementType() == ((DataCollector::MovementData*)(*it))->getMovementType()))
+				{
+					present_data->setMovementType(past_data->getMovementType());
+				}
+			}
+		}
+
+		else
+		{
+			it++;
+		}
+
+		past_data = present_data;
+	}
+
+	it = collector.mylist.begin();
+	past_data = *it;
+	it++;
+
+	while (it != collector.mylist.end())
+	{
+		if ((((DataCollector::MovementData*)(*it))->getMovementType()) == (past_data->getMovementType()))
+		{
+			past_data->appendLength(((DataCollector::MovementData*)(*it))->getLength());
+			collector.mylist.erase(it++);
+		}
+
+		else
+		{
+			past_data = *(it++);
+		}
+	}
+
+	std::cout << std::endl << std::endl;
+	it = collector.mylist.begin();
+	for (; it != collector.mylist.end(); it++)
+	{
+		std::cout << "Movement Type: " << (DataCollector::MovementData*)(*it)->getMovementType();
+		std::cout << "       Length: " << (DataCollector::MovementData*)(*it)->getLength() << std::endl;
+	}
 
 	std::cin.get();
 
@@ -262,4 +403,6 @@ int main(int argc, char** argv)
         std::cin.ignore();
         return 1;
     }
+
+	return 0;
 }
