@@ -18,20 +18,18 @@ public class Utilities {
 	public static double smallMovementTime, bigMovementTime;
 	public static double[] movementGraph;
 
-	public static void executeMyo() {
-		try {
-			myoProcess = Runtime.getRuntime().exec(
-					"hello-myo-VisualStudio2013.exe");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	public static void executeMyo(){
+			try {
+				myoProcess = Runtime.getRuntime().exec("C:\\Users\\Anfernee Goon\\Desktop\\Programming\\SD Hacks\\HowToSpeech\\src\\main\\cpp\\samples\\x64\\Debug\\hello-myo-VisualStudio2013.exe");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 	}
-
-	public static void stopMyo() {
-		try {
-			BufferedWriter out = new BufferedWriter(new OutputStreamWriter(
-					myoProcess.getOutputStream()));
-			out.write("a");
+	
+	public static void stopMyo(){
+		try{
+			BufferedWriter out = new BufferedWriter(new OutputStreamWriter(myoProcess.getOutputStream()));
+			out.write("\n");
 			out.flush();
 			out.close();
 
@@ -133,8 +131,20 @@ public class Utilities {
 				* format.getFrameSize() + .5);
 	}
 
-	public static void main(String[] args) {
-
+	public static void main(String[] args)
+	{
+		executeMyo();
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		stopMyo();
+		parseMyoData();
+		System.out.println("Total Time: " + totalTime);
+		System.out.println("Small Movement Time: " + smallMovementTime);
+		System.out.println("Big Movement Time: " + bigMovementTime);
 	}
 
 }

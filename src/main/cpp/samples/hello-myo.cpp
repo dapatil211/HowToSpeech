@@ -18,11 +18,12 @@
 
 std::atomic<bool> stop(false);
 
-const double SMALL_PERCENT_THRESHOLD = 0.009;
-const double LARGE_PERCENT_THRESHOLD = 0.01;
+const double SMALL_PERCENT_THRESHOLD = 0.001;
+const double LARGE_PERCENT_THRESHOLD = 0.012;
 const double ACCELERATION_THRESHOLD = 0.0026;
 const double REFRESH_RATE = 10.0;
-const int LENGTH_THRESHOLD = 3;
+const int LENGTH_THRESHOLD = 2;
+const int NO_CHANGE_THRESHOLD = 4;
 const int SENSITIVITY = 100; // Default is 18, higher is more sensitive
 
 const short NO_MOVEMENT = 0;
@@ -173,7 +174,7 @@ public:
 					mylist.push_back(new MovementData(LARGE_MOVEMENT));
 				}
 
-				// std::cout << "Big Change: " << big_change << std::endl;
+				//std::cout << "Big Change: " << big_change << std::endl;
 			}
 
 
@@ -213,16 +214,19 @@ public:
 							mylist.push_back(new MovementData(SMALL_MOVEMENT));
 						}
 
-						// std::cout << "Small Change: " << small_change << std::endl;
+						//std::cout << "Small Change: " << small_change << std::endl;
 					}
 				}
 
 
 
 			}
+
 		}
+
 		// no movement
 		if (!big_movement && !movement){
+			no_change += 1.0 / REFRESH_RATE;
 			if (!mylist.empty()){
 				if (mylist.back()->getMovementType() == NO_MOVEMENT){
 					mylist.back()->addLength();
@@ -234,7 +238,9 @@ public:
 			else{
 				mylist.push_back(new MovementData(NO_MOVEMENT));
 			}
+			//std::cout << "No Change: " << no_change << std::endl;
 		}
+		
 		super_past_roll = past_roll;
 		super_past_pitch = past_pitch;
 		super_past_yaw = past_yaw;
@@ -283,6 +289,7 @@ public:
 	int super_past_roll, super_past_pitch, super_past_yaw;
 	double small_change = 0;
 	double big_change = 0;
+	double no_change = 0;
     myo::Pose currentPose;
 };
 
@@ -351,14 +358,32 @@ void loop(){
 		while (it != collector.mylist.end())
 		{
 			DataCollector::MovementData* present_data = *it;
-			if (((DataCollector::MovementData*)(*it))->getLength() < LENGTH_THRESHOLD)
+			if (present_data->getMovementType() == NO_MOVEMENT)
+			{
+				it++;
+				if (present_data->getLength() < NO_CHANGE_THRESHOLD)
+				{
+					if (it != collector.mylist.end())
+					{
+						if ((past_data->getMovementType() == ((DataCollector::MovementData*)(*it))->getMovementType()))
+						{
+							present_data->setMovementType(past_data->getMovementType());
+						}
+					}
+				}
+			}
+
+			else if (present_data->getLength() < LENGTH_THRESHOLD)
 			{
 				it++;
 				if (it != collector.mylist.end())
 				{
 					if ((past_data->getMovementType() == ((DataCollector::MovementData*)(*it))->getMovementType()))
 					{
-						present_data->setMovementType(past_data->getMovementType());
+						if (past_data->getMovementType() != NO_MOVEMENT)
+						{
+							present_data->setMovementType(past_data->getMovementType());
+						}
 					}
 				}
 			}
@@ -416,6 +441,5 @@ int main(int argc, char** argv)
 	std::cin.get();
 	stop = true;
 	first.join();
-	std::cin.get();
 	return 0;
 }
