@@ -46,6 +46,12 @@ public class RecordServlet extends HttpServlet {
 
 
 	double[] pts = {0, 1, 1, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 2, 2, 2, 1, 0, 1, 1, 2, 2};
+	
+	for (int i = 0; i < pts.length; ++i)
+	{
+		pts[i] *= 50;
+	}
+	
 	System.out.println(getMovementChart(pts));
 
 			Map<String, String> retVal = new HashMap<String, String>();
@@ -59,7 +65,7 @@ public class RecordServlet extends HttpServlet {
 			String details = "Try waving your arms less."; // Suggestions
 
 			retVal.put("speech", speech);
-			retVal.put("movement_graph", movements);
+			retVal.put("movement_graph", getMovementChart(pts));
 			retVal.put("volume_graph", volume);
 			retVal.put("personality", personality);
 			retVal.put("grade", grade);
@@ -76,9 +82,9 @@ public class RecordServlet extends HttpServlet {
 
 		// Defining chart.
 		LineChart chart = GCharts.newLineChart(line);
-		chart.setSize(450, 600);
+		chart.setSize(1000, 300);
 		chart.setTitle("Your Movements", Color.WHITE, 14);
-		chart.setGrid(25, 25, 3, 2);
+		chart.setGrid(100, 50, 1, 1);
 
 		// Defining axis info and styles
 		AxisStyle axisStyle = AxisStyle.newAxisStyle(Color.WHITE, 12, AxisTextAlignment.CENTER);
