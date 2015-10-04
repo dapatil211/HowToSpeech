@@ -28,6 +28,8 @@ public class MicRunnable implements Runnable {
 
 	TargetDataLine microphone = null;
 	AudioInputStream inputStream =null;
+	List<Integer> volumes = null;
+	String speech = "";
 
 	public void finish() throws IOException {
 		microphone.stop();
@@ -38,7 +40,7 @@ public class MicRunnable implements Runnable {
 	public void run() {
 		try {
 			List<SpeechResults> transcripts = new ArrayList<SpeechResults>();
-			List<Integer> volumes = new ArrayList<Integer>();
+			volumes = new ArrayList<Integer>();
 			AudioFormat format = new AudioFormat(8000.0f, 16, 1, true, true);
 			microphone = AudioSystem.getTargetDataLine(format);
 
@@ -86,6 +88,7 @@ public class MicRunnable implements Runnable {
 				offset++;
 			}
 			String text = Utilities.combineStrings(transcripts);
+			speech = text;
 			System.out.println(text);
 			Map<String, String> params = new HashMap<String, String>();
 			params.put("body", text);

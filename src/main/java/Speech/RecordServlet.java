@@ -2,6 +2,7 @@ package Speech;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -35,6 +36,7 @@ public class RecordServlet extends HttpServlet {
 			throws ServletException, IOException {
 		String action = req.getParameter("action");
 		if ("start".equals(action)) {
+			Utilities.executeMyo();
 			MicRunnable micRunnable = new MicRunnable();
 			Thread micThread = new Thread(micRunnable);
 			micThread.start();
@@ -44,38 +46,47 @@ public class RecordServlet extends HttpServlet {
 			resp.getWriter().write(gson.toJson(retVal));
 		}
 		else if("stop".equals(action)){
+			Utilities.stopMyo();
+			Utilities.parseMyoData();
+			double[] movement = Utilities.getMovementGraphArray();
 			long id = Long.parseLong(req.getParameter("user_id"));
-			threads.get(id).finish();
+			MicRunnable micRunnable = threads.get(id);
+			micRunnable.finish();
+			List<Integer> tempVols = micRunnable.volumes;
+			double[] volumes = new double[tempVols.size()];
+			for(int i = 0; i < tempVols.size(); i ++){
+				volumes[i] = tempVols.get(i);
+			}
 
-
-	double[] pts = {0, 1, 1, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 2, 2, 2, 1, 0, 1, 1, 2, 2};
-	double[] pts2 = {4, 28, 46, 38, 36, 38, 40, 29, 10, 8, 14, 15, 11, 11};
+//	double[] pts = {0, 1, 1, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 2, 2, 2, 1, 0, 1, 1, 2, 2};
+//	double[] pts2 = {4, 28, 46, 38, 36, 38, 40, 29, 10, 8, 14, 15, 11, 11};
 	
 	
 	// Hacky solution: scale the data up to match the graph scales, which I have trouble changing
-	for (int i = 0; i < pts.length; ++i)
+	for (int i = 0; i < movement.length; ++i)
 	{
-		pts[i] *= 50;
+		movement[i] *= 50;
 	}
 	
-	for (int i = 0; i < pts2.length; ++i)
+	for (int i = 0; i < volumes.length; ++i)
 	{
-		pts2[i] *= 2;
+		volumes[i] *= 2;
 	}
 
 			Map<String, String> retVal = new HashMap<String, String>();
 
 			// Set appropriately based on Watson and our own processing
-			String speech = "Lorem ipsum"; // Speech text
+			String speech = micRunnable.speech; //TODO // Speech text
 			String tone = "You're angry"; // Personality report
-			String grade = "A-"; // Speech grade
+			String volumeGrade = Utilities.numericToLetterGrade(Utilities.volumeGrader(tempVols)); // Speech grade
+			String movementGrade = Utilities.numericToLetterGrade(Utilities.movementGrade());
 			String details = "Try waving your arms less."; // Suggestions
 
 			retVal.put("speech", speech);
-			retVal.put("movement_graph", getMovementChart(pts));
-			retVal.put("volume_graph", getVolumeChart(pts2));
+			retVal.put("movement_graph", getMovementChart(movement));
+			retVal.put("volume_graph", getVolumeChart(volumes));
 			retVal.put("tone", tone);
-			retVal.put("grade", grade);
+			retVal.put("grade", movementGrade);
 			retVal.put("details", details);
 
 			resp.getWriter().write(gson.toJson(retVal));
