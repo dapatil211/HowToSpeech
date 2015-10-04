@@ -5,7 +5,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +31,7 @@ public class MicRunnable implements Runnable {
 	String speech = "";
 
 	public void finish() throws IOException {
-		System.out.println("STOP");
+//		System.out.println("STOP");
 		microphone.stop();
 		microphone.close();
 		inputStream.close();
@@ -61,12 +60,12 @@ public class MicRunnable implements Runnable {
 			while (true) {
 				int numBytesRead = inputStream.read(data);
 				totalBytes += numBytesRead;
-				System.out.println(totalBytes);
+//				System.out.println(totalBytes);
 				int volume = Utilities.calculateRMSLevel(data);
 				volumes.add(volume);
-				System.out.println("V " + volume);
+//				System.out.println("V " + volume);
 				if (numBytesRead == 0 && out.size() > 100) {
-					System.out.println("In watson end");
+//					System.out.println("In watson end");
 					AudioInputStream outInputStream = new AudioInputStream(
 							new ByteArrayInputStream(out.toByteArray()),
 							format, out.size() / format.getFrameSize());
@@ -81,7 +80,7 @@ public class MicRunnable implements Runnable {
 				out.write(data);
 				if (offset == 64) {
 					offset = -1;
-					System.out.println("In watson");
+//					System.out.println("In watson");
 					AudioInputStream outInputStream = new AudioInputStream(
 							new ByteArrayInputStream(out.toByteArray()),
 							format, out.size() / format.getFrameSize());
@@ -96,7 +95,7 @@ public class MicRunnable implements Runnable {
 			}
 			String text = Utilities.combineStrings(transcripts);
 			speech = text;
-			System.out.println(text);
+//			System.out.println(text);
 //			Map<String, String> params = new HashMap<String, String>();
 //			params.put("body", text);
 //			Map<String, String> res = Utilities
@@ -104,7 +103,7 @@ public class MicRunnable implements Runnable {
 //							"https://stream.watsonplatform.net/tone-analyzer-experimental/api/v1/tone",
 //							params);
 //			System.out.println(res);
-			System.out.println(volumes);
+//			System.out.println(volumes);
 		} catch (IOException ex) {
 			// Handle the error ...
 		} catch (LineUnavailableException e) {
@@ -127,7 +126,7 @@ public class MicRunnable implements Runnable {
 			transcript = service.recognize(params);
 		} catch (Exception e) {
 		}
-		System.out.println("Watson request");
+//		System.out.println("Watson request");
 		return transcript;
 	}
 }
