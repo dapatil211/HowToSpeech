@@ -30,10 +30,14 @@
 				<div class="col-md-8">
 					<h1 class="title">How2Speech</h1>
 					<p id="start-instructions">
-						Click <button type="button" class="btn btn-default btn-record" onclick="startRecord()">Record</button> to get started.
+						Click 
+						<button type="button" class="btn btn-default btn-record" id="start-btn">Record</button> 
+						to get started.
 					</p>
 					<p id="stop-instructions">
-						Click <button type="button" class="btn btn-default btn-record" onclick="stopRecord()">Stop</button> to finish.
+						Click 
+						<button type="button" class="btn btn-default btn-record" id="stop-btn">Stop</button> 
+						to finish.
 					</p>
 				</div>
 				<div class="col-md-2"></div>
@@ -44,9 +48,20 @@
 				<div class="col-md-2"></div>
 
 				<div class="col-md-8">
-
-
+					<h2>${speech.text}</h2>
+					<textarea class="form-control">Lorem ipsum</textarea>
 					
+					<h2>Your Movements</h2>
+					<img src="${movements.img}">
+
+					<h2>Your Volume</h2>
+					<img src="${volume.img}">
+
+					<h2>Your Personality</h2>
+					<p>${personality.text}</p>
+
+					<h2>Your Grade: ${grade.text}</h2>
+					<p>${grade.text}</p>
 				</div>
 
 				<div class="col-md-2"></div>
