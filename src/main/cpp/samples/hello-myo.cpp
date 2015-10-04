@@ -23,7 +23,7 @@ const double LARGE_PERCENT_THRESHOLD = 0.012;
 const double ACCELERATION_THRESHOLD = 0.0026;
 const double REFRESH_RATE = 10.0;
 const int LENGTH_THRESHOLD = 2;
-const int NO_CHANGE_THRESHOLD = 4;
+const int NO_CHANGE_THRESHOLD = 8;
 const int SENSITIVITY = 100; // Default is 18, higher is more sensitive
 
 const short NO_MOVEMENT = 0;
@@ -346,15 +346,15 @@ void loop(){
 		/*
 		for (; it != collector.mylist.end(); it++)
 		{
-			std::cout << "Movement Type: " << (DataCollector::MovementData*)(*it)->getMovementType();
-			std::cout << "       Length: " << (DataCollector::MovementData*)(*it)->getLength() << std::endl;
-		} */
+			printf("Movement Type:%d", (DataCollector::MovementData*)(*it)->getMovementType());
+			printf("       Length:%d\n", (DataCollector::MovementData*)(*it)->getLength());
+		}
 
-		// it = collector.mylist.begin();
+		 it = collector.mylist.begin();*/
 
 		DataCollector::MovementData* past_data = *it;
 		it++;
-		// std::cout << std::endl << std::endl;
+		//std::cout << std::endl << std::endl;
 		while (it != collector.mylist.end())
 		{
 			DataCollector::MovementData* present_data = *it;
@@ -415,15 +415,16 @@ void loop(){
 		}
 
 		// std::cout << std::endl << std::endl;
+
 		it = collector.mylist.begin();
 		for (; it != collector.mylist.end(); it++)
 		{
-			// std::cout << "Movement Type: " << (DataCollector::MovementData*)(*it)->getMovementType();
-			// std::cout << "       Length: " << (DataCollector::MovementData*)(*it)->getLength() << std::endl;
+			//printf("Movement Type:%d", (DataCollector::MovementData*)(*it)->getMovementType());
+			//printf("       Length:%d\n",(DataCollector::MovementData*)(*it)->getLength());
 
 			printf("%d\n", (DataCollector::MovementData*)(*it)->getMovementType());
 			printf("%d\n", (DataCollector::MovementData*)(*it)->getLength());
-		} 
+		}
 		// If a standard exception occurred, we print out its message and exit.
 	}
 	catch (const std::exception& e) {
@@ -441,5 +442,6 @@ int main(int argc, char** argv)
 	std::cin.get();
 	stop = true;
 	first.join();
+	std::cin.get();
 	return 0;
 }
