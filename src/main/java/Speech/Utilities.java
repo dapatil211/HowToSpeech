@@ -37,6 +37,7 @@ public class Utilities {
 	public static String movementAdvice;
 	public static boolean volumeLoud;
 	public static int volumeGrade;
+	public static int concentrationGrade;
 
 	public static void executeMyo(){
 			try {
@@ -229,6 +230,15 @@ double total = 0, small = 0, big = 0;
 		return (int) (100 - 10*Math.abs(averageDX - 5.0));
 	}
 	
+	public static int concentrationGrade(double[] array){
+		double sum = 0;
+		for(int i = 0; i < array.length; i++){
+			sum+= array[i];
+		}
+		concentrationGrade = (int) (sum/array.length);
+		return (int) (sum/array.length);
+	}
+	
 	public static String getVolumeAdvice(){
 		if(volumeLoud){
 			return "Try varying the volume of your voice less.";
@@ -238,7 +248,7 @@ double total = 0, small = 0, big = 0;
 		}
 	}
 	
-	public static int getOverallGrade(int speechGrade, int volumeGrade, int toneGrade, int concentrationGrade){
+	public static int getOverallGrade(int speechGrade, int volumeGrade, int toneGrade, int concentrationGradeInput){
 		return (int)(0.5*speechGrade + 0.15*movementGrade() + 0.1 *volumeGrade + 0.1*concentrationGrade + .15*toneGrade);
 	}
 	
