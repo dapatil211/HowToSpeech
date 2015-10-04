@@ -34,7 +34,7 @@ public class RecordServlet extends HttpServlet {
 			throws ServletException, IOException {
 		String action = req.getParameter("action");
 		if ("start".equals(action)) {
-//			Utilities.executeMyo();
+      Utilities.executeMyo();
 			MicRunnable micRunnable = new MicRunnable();
 			Thread micThread = new Thread(micRunnable);
 			micThread.start();
@@ -45,9 +45,9 @@ public class RecordServlet extends HttpServlet {
 			resp.getWriter().write(gson.toJson(retVal));
 		}
 		else if("stop".equals(action)){
-//			Utilities.stopMyo();
-//			Utilities.parseMyoData();
-//			double[] movement = Utilities.getMovementGraphArray();
+			Utilities.stopMyo();
+			Utilities.parseMyoData();
+			double[] movement = Utilities.getMovementGraphArray();
 			long id = Long.parseLong(req.getParameter("user_id"));
 			MicRunnable micRunnable = threads.get(id);
 			micRunnable.finish();
@@ -70,10 +70,10 @@ public class RecordServlet extends HttpServlet {
 	
 	
 	// Hacky solution: scale the data up to match the graph scales, which I have trouble changing
-//	for (int i = 0; i < movement.length; ++i)
-//	{
-//		movement[i] *= 50;
-//	}
+	for (int i = 0; i < movement.length; ++i)
+	{
+		movement[i] *= 50;
+	}
 	
 	for (int i = 0; i < volumes.length; ++i)
 	{
@@ -85,12 +85,12 @@ public class RecordServlet extends HttpServlet {
 			// Set appropriately based on Watson and our own processing
 			String speech = micRunnable.speech; //TODO // Speech text
 			String tone = "You're angry"; // Personality report
-//			String volumeGrade = Utilities.numericToLetterGrade(Utilities.volumeGrader(tempVols)); // Speech grade
+			String volumeGrade = Utilities.numericToLetterGrade(Utilities.volumeGrader(tempVols)); // Speech grade
 			String movementGrade = Utilities.numericToLetterGrade(Utilities.movementGrade());
 			String details = "Try waving your arms less."; // Suggestions
 
 			retVal.put("speech", speech);
-//			retVal.put("movement_graph", getMovementChart(movement));
+			retVal.put("movement_graph", getMovementChart(movement));
 			retVal.put("volume_graph", getVolumeChart(volumes));
 			retVal.put("tone", tone);
 			retVal.put("grade", movementGrade);
