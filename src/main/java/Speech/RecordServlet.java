@@ -65,19 +65,14 @@ public class RecordServlet extends HttpServlet {
 				volumes[i] = tempVols.get(i);
 			}
 
-//	double[] pts = {0, 1, 1, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 2, 2, 2, 1, 0, 1, 1, 2, 2};
-//	double[] pts2 = {4, 28, 46, 38, 36, 38, 40, 29, 10, 8, 14, 15, 11, 11};
+// double[] movement = {0, 1, 1, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 2, 2, 2, 1, 0, 1, 1, 2, 2};
+double[] dummy = {4, 28, 46, 38, 36, 38, 40, 29, 10, 8, 14, 15, 11, 11};
 	
 	
 	// Hacky solution: scale the data up to match the graph scales, which I have trouble changing
 	for (int i = 0; i < movement.length; ++i)
 	{
 		movement[i] *= 50;
-	}
-	
-	for (int i = 0; i < volumes.length; ++i)
-	{
-		volumes[i] *= 2;
 	}
 
 			Map<String, String> retVal = new HashMap<String, String>();
@@ -92,12 +87,50 @@ public class RecordServlet extends HttpServlet {
 			retVal.put("speech", speech);
 			retVal.put("movement_graph", getMovementChart(movement));
 			retVal.put("volume_graph", getVolumeChart(volumes));
+			retVal.put("concentration_graph", getConcentrationChart(dummy));
 			retVal.put("tone", tone);
 			retVal.put("grade", movementGrade);
 			retVal.put("details", details);
 
 			resp.getWriter().write(gson.toJson(retVal));
 		}
+	}
+
+	private String getConcentrationChart(double[] pts) {
+
+		// Defining lines
+		Line line = Plots.newLine(Data.newData(pts), Color.newColor("CA3D05"), "Concentration");
+		line.setLineStyle(LineStyle.newLineStyle(3, 1, 0));
+
+		// Defining chart.
+		LineChart chart = GCharts.newLineChart(line);
+		chart.setSize(870, 300);
+		chart.setTitle("Your Concentration Levels", Color.WHITE, 14);
+		chart.setGrid(100, 25, 1, 1);
+
+		// Defining axis info and styles
+		AxisStyle axisStyle = AxisStyle.newAxisStyle(Color.WHITE, 12, AxisTextAlignment.CENTER);
+		AxisLabels xAxis = AxisLabelsFactory.newAxisLabels("Time");
+		xAxis.setAxisStyle(axisStyle);
+
+		AxisLabels yAxis = AxisLabelsFactory.newAxisLabels("Concentration");
+		yAxis.setAxisStyle(axisStyle);
+
+		// Adding axis info to chart.
+		chart.addXAxisLabels(xAxis);
+		chart.addYAxisLabels(yAxis);
+
+		// Defining background and chart fills.
+		chart.setBackgroundFill(Fills.newSolidFill(Color.newColor("1F1D1D")));
+		LinearGradientFill fill = Fills.newLinearGradientFill(0, Color.newColor("363433"), 100);
+		fill.addColorAndOffset(Color.newColor("2E2B2A"), 0);
+		chart.setAreaFill(fill);
+		String url = chart.toURLString();
+
+		System.err.println(url);
+
+		return url;		
+
 	}
 
 	String getMovementChart (double[] movPts) {
