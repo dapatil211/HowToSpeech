@@ -173,7 +173,7 @@ public:
 					mylist.push_back(new MovementData(LARGE_MOVEMENT));
 				}
 
-				std::cout << "Big Change: " << big_change << std::endl;
+				// std::cout << "Big Change: " << big_change << std::endl;
 			}
 
 
@@ -214,7 +214,7 @@ public:
 							mylist.push_back(new MovementData(SMALL_MOVEMENT));
 						}
 
-						std::cout << "Small Change: " << small_change << std::endl;
+						// std::cout << "Small Change: " << small_change << std::endl;
 					}
 				}
 
@@ -295,7 +295,7 @@ void loop(){
 		// publishing your application. The Hub provides access to one or more Myos.
 		myo::Hub hub("com.example.hello-myo");
 
-		std::cout << "Attempting to find a Myo..." << std::endl;
+		// std::cout << "Attempting to find a Myo..." << std::endl;
 
 		// Next, we attempt to find a Myo to use. If a Myo is already paired in Myo Connect, this will return that Myo
 		// immediately.
@@ -309,7 +309,7 @@ void loop(){
 		}
 
 		// We've found a Myo.
-		std::cout << "Connected to a Myo armband!" << std::endl << std::endl;
+		// std::cout << "Connected to a Myo armband!" << std::endl << std::endl;
 
 		// Next we construct an instance of our DeviceListener, so that we can register it with the Hub.
 		DataCollector collector;
@@ -319,7 +319,7 @@ void loop(){
 		hub.addListener(&collector);
 
 		// Finally we enter our main loop.
-
+		time_t start = time(NULL);
 		while (!stop)
 		{
 			// In each iteration of our main loop, we run the Myo event loop for a set number of milliseconds.
@@ -330,15 +330,21 @@ void loop(){
 			collector.collectData();
 		}
 
-		std::list<DataCollector::MovementData*>::iterator it = collector.mylist.begin();
+		time_t end = time(NULL);
+		std::cout << difftime(end, start) << std::endl;
+		// total change times
+		std::cout << collector.small_change << std::endl;
+		std::cout << collector.big_change << std::endl;
 
+		std::list<DataCollector::MovementData*>::iterator it = collector.mylist.begin();
+		/*
 		for (; it != collector.mylist.end(); it++)
 		{
 			std::cout << "Movement Type: " << (DataCollector::MovementData*)(*it)->getMovementType();
 			std::cout << "       Length: " << (DataCollector::MovementData*)(*it)->getLength() << std::endl;
-		}
+		} */
 
-		it = collector.mylist.begin();
+		// it = collector.mylist.begin();
 
 		DataCollector::MovementData* past_data = *it;
 		it++;
@@ -386,11 +392,14 @@ void loop(){
 
 		std::cout << std::endl << std::endl;
 		it = collector.mylist.begin();
+		
 		for (; it != collector.mylist.end(); it++)
 		{
-			std::cout << "Movement Type: " << (DataCollector::MovementData*)(*it)->getMovementType();
-			std::cout << "       Length: " << (DataCollector::MovementData*)(*it)->getLength() << std::endl;
-		}
+			// std::cout << "Movement Type: " << (DataCollector::MovementData*)(*it)->getMovementType();
+			// std::cout << "       Length: " << (DataCollector::MovementData*)(*it)->getLength() << std::endl;
+			std::cout << (DataCollector::MovementData*)(*it)->getMovementType() << std::endl;
+			std::cout << (DataCollector::MovementData*)(*it)->getLength() << std::endl;
+		} 
 		// If a standard exception occurred, we print out its message and exit.
 	}
 	catch (const std::exception& e) {
@@ -404,7 +413,7 @@ void loop(){
 
 int main(int argc, char** argv)
 {
-	time_t start = time(NULL);
+	
 	std::thread first(loop);
 	std::cin.get();
 	stop = true;
@@ -413,11 +422,7 @@ int main(int argc, char** argv)
 
 
 
-	time_t end = time(NULL);
 
-
-
-	std::cout << difftime(end, start) << std::endl;
 
 
 
