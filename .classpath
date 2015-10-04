@@ -5,5 +5,7 @@
 	<classpathentry kind="lib" path="lib/jetty-all-7.0.2.v20100331.jar"/>
 	<classpathentry kind="lib" path="lib/servlet-api-2.5.jar"/>
 	<classpathentry kind="lib" path="lib/gson-2.3.1.jar"/>
+	<classpathentry kind="lib" path="lib/java-wrapper-1.0.2.jar"/>
+	<classpathentry kind="lib" path="lib/httpcore-4.4.3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
