@@ -34,7 +34,8 @@ public class RecordServlet extends HttpServlet {
 			throws ServletException, IOException {
 		String action = req.getParameter("action");
 		if ("start".equals(action)) {
-      Utilities.executeMyo();
+			Utilities.executeMyo();
+			Muse.start();
 			MicRunnable micRunnable = new MicRunnable();
 			Thread micThread = new Thread(micRunnable);
 			micThread.start();
@@ -47,6 +48,9 @@ public class RecordServlet extends HttpServlet {
 		else if("stop".equals(action)){
 			Utilities.stopMyo();
 			Utilities.parseMyoData();
+			Muse.stopRecording();
+			Muse.parseData();
+			double[] concentration = Muse.concentrationArray;
 			double[] movement = Utilities.getMovementGraphArray();
 			long id = Long.parseLong(req.getParameter("user_id"));
 			MicRunnable micRunnable = threads.get(id);
@@ -87,7 +91,7 @@ double[] dummy = {4, 28, 46, 38, 36, 38, 40, 29, 10, 8, 14, 15, 11, 11};
 			retVal.put("speech", speech);
 			retVal.put("movement_graph", getMovementChart(movement));
 			retVal.put("volume_graph", getVolumeChart(volumes));
-			retVal.put("concentration_graph", getConcentrationChart(dummy));
+			retVal.put("concentration_graph", getConcentrationChart(concentration));
 			retVal.put("tone", tone);
 			retVal.put("grade", movementGrade);
 			retVal.put("details", details);
