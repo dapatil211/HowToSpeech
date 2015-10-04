@@ -40,6 +40,7 @@ function stopRecord ()
 
 	$("#"+STOP_P_ID)[0].style.display = "none";
 	$("#"+START_P_ID)[0].style.display = "block";
+	$("#main")[0].style.visibility = "visible";
 }
 
 function writeResults (data)
@@ -47,4 +48,7 @@ function writeResults (data)
 	$("#speech_txt").val(data["speech"]);
 	$("#movements_img").attr("src", data["movement_graph"]);
 	$("#volume_img").attr("src", data["volume_graph"]);
+	$("#personality_txt").text(data["personality"]);
+	$("#grade_txt").text("Your Grade: " + data["grade"]);
+	$("#details_txt").text(data["details"]);
 }

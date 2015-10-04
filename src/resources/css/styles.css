@@ -38,6 +38,11 @@ body
 	color: #FFF;
 }
 
+#main
+{
+	visibility: hidden;
+}
+
 #start-instructions
 {
 	display: block;
