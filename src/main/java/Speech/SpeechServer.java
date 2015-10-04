@@ -14,7 +14,7 @@ public class SpeechServer {
 		//static files
 		DefaultServlet defaultServlet = new DefaultServlet();
 		ServletHolder staticHolder = new ServletHolder(defaultServlet);
-		staticHolder.setInitParameter("resourceBase", "./src/resources/html");
+		staticHolder.setInitParameter("resourceBase", "./src/resources");
 		handler.addServlet(staticHolder, "/");
 		
 		server.setHandler(handler);
