@@ -395,8 +395,9 @@ void loop(){
 		{
 			// std::cout << "Movement Type: " << (DataCollector::MovementData*)(*it)->getMovementType();
 			// std::cout << "       Length: " << (DataCollector::MovementData*)(*it)->getLength() << std::endl;
-			std::cout << (DataCollector::MovementData*)(*it)->getMovementType() << std::endl;
-			std::cout << (DataCollector::MovementData*)(*it)->getLength() << std::endl;
+
+			printf("%d\n", (DataCollector::MovementData*)(*it)->getMovementType());
+			printf("%d\n", (DataCollector::MovementData*)(*it)->getLength());
 		} 
 		// If a standard exception occurred, we print out its message and exit.
 	}
