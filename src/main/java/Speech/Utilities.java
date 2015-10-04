@@ -3,12 +3,28 @@ package Speech;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.sound.sampled.AudioFormat;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
+
+import com.google.gson.Gson;
+import com.ibm.watson.developer_cloud.speech_to_text.v1.model.SpeechResults;
+import com.ibm.watson.developer_cloud.speech_to_text.v1.model.Transcript;
 
 public class Utilities {
 
@@ -129,12 +145,56 @@ public class Utilities {
 	 *         time.
 	 */
 	public static int getNumOfBytes(double seconds, AudioFormat format) {
-		return (int) (seconds * format.getSampleRate()
-				* format.getFrameSize() + .5);
+		return (int) (seconds * format.getSampleRate() * format.getFrameSize() + .5);
 	}
 
 	public static void main(String[] args) {
 
+	}
+
+	public static String combineStrings(List<SpeechResults> results) {
+		String speech = "";
+		for (SpeechResults result : results) {
+			List<Transcript> transcripts = result.getResults();
+			for (Transcript transcript : transcripts) {
+				transcript.getAlternatives().get(0).getTranscript();
+			}
+		}
+		return speech;
+	}
+
+	public static Map<String, String> sendRequest(String url,
+			Map<String, String> params) throws ClientProtocolException,
+			IOException {
+		HttpClient httpclient = HttpClients.createDefault();
+		HttpPost httppost = new HttpPost(url);
+
+		List<NameValuePair> parameters = new ArrayList<NameValuePair>(2);
+
+		for (Entry<String, String> entry : params.entrySet()) {
+			parameters.add(new BasicNameValuePair(entry.getKey(), entry
+					.getValue()));
+		}
+
+		// Execute and get the response.
+		HttpResponse response = httpclient.execute(httppost);
+		HttpEntity entity = response.getEntity();
+
+		if (entity != null) {
+			InputStream instream = entity.getContent();
+			try {
+				String json = "";
+				byte[] stream = new byte[instream.available()];
+
+				while (instream.read(stream) != -1) {
+					json += new String(stream);
+				}
+				return (new Gson()).fromJson(json, Map.class);
+			} finally {
+				instream.close();
+			}
+		}
+		return null;
 	}
 
 }

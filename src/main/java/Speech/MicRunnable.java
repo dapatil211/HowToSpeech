@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,15 +27,18 @@ public class MicRunnable implements Runnable {
 	private static final String WATSON_USERNAME = "21d3a7d1-b2c5-471b-a66c-d20885130dda";
 
 	TargetDataLine microphone = null;
+	AudioInputStream inputStream =null;
 
-	public void finish() {
+	public void finish() throws IOException {
 		microphone.stop();
 		microphone.close();
+		inputStream.close();
 	}
 
 	public void run() {
 		try {
 			List<SpeechResults> transcripts = new ArrayList<SpeechResults>();
+			List<Integer> volumes = new ArrayList<Integer>();
 			AudioFormat format = new AudioFormat(8000.0f, 16, 1, true, true);
 			microphone = AudioSystem.getTargetDataLine(format);
 
@@ -43,7 +47,7 @@ public class MicRunnable implements Runnable {
 
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 			byte[] data = new byte[8000 * format.getFrameSize()];
-			AudioInputStream inputStream = new AudioInputStream(microphone);
+			inputStream = new AudioInputStream(microphone);
 
 			microphone.start();
 			SpeechToText service = new SpeechToText();
@@ -52,7 +56,18 @@ public class MicRunnable implements Runnable {
 			int offset = 0;
 			while (true) {
 				int numBytesRead = inputStream.read(data);
-				if (numBytesRead == -1) {
+				System.out.println(numBytesRead);
+				volumes.add(Utilities.calculateRMSLevel(data));
+				if (numBytesRead == 0) {
+					AudioInputStream outInputStream = new AudioInputStream(
+							new ByteArrayInputStream(out.toByteArray()),
+							format, out.size() / format.getFrameSize());
+					out.reset();
+					File fileOut = new File("./watson/sound.wav");
+					AudioSystem.write(outInputStream,
+							AudioFileFormat.Type.WAVE, fileOut);
+					SpeechResults transcript = textToSpeech(service, fileOut);
+					transcripts.add(transcript);
 					break;
 				}
 				out.write(data);
@@ -61,15 +76,22 @@ public class MicRunnable implements Runnable {
 					AudioInputStream outInputStream = new AudioInputStream(
 							new ByteArrayInputStream(out.toByteArray()),
 							format, out.size() / format.getFrameSize());
+					out.reset();
 					File fileOut = new File("./watson/sound.wav");
 					AudioSystem.write(outInputStream,
 							AudioFileFormat.Type.WAVE, fileOut);
 					SpeechResults transcript = textToSpeech(service, fileOut);
 					transcripts.add(transcript);
-					System.out.println(transcript);
 				}
 				offset++;
 			}
+			String text = Utilities.combineStrings(transcripts);
+			System.out.println(text);
+			Map<String, String> params = new HashMap<String, String>();
+			params.put("body", text);
+			Map<String, String> res = Utilities.sendRequest("https://stream.watsonplatform.net/tone-analyzer-experimental/api/v1/tone", params);
+			System.out.println(res);
+			System.out.println(volumes);
 		} catch (IOException ex) {
 			// Handle the error ...
 		} catch (LineUnavailableException e) {
